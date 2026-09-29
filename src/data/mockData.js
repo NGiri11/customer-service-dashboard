@@ -80,3 +80,26 @@ export const serviceRequests = [
     date: "2026-09-22",
   },
 ];
+
+export const dashboardStats = {
+  Today: {
+    totalCustomers: 5,
+    activeServices: 3,
+    pendingRequests: 2,
+    revenue: 4580,
+  },
+
+  "This Week": {
+    totalCustomers: 18,
+    activeServices: 12,
+    pendingRequests: 7,
+    revenue: 15240,
+  },
+
+  "This Month": {
+    totalCustomers: 42,
+    activeServices: 28,
+    pendingRequests: 15,
+    revenue: 42800,
+  },
+};

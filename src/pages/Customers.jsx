@@ -7,16 +7,24 @@ import {
   Mail,
   Phone,
   Briefcase,
-  X,
 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
+import StatusBadge from "../components/StatusBadge";
+import Modal from "../components/Modal";
+import Input from "../components/Input";
 
 function Customers({ customers, setCustomers }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+
   const [showAddModal, setShowAddModal] = useState(false);
+
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const [formErrors, setFormErrors] = useState({});
+
   const [newCustomer, setNewCustomer] = useState({
     name: "",
     email: "",
@@ -25,14 +33,12 @@ function Customers({ customers, setCustomers }) {
     status: "Active",
   });
 
-  /*
-   * Filter customers according to search
-   * and selected status.
-   */
-  const filteredCustomers = useMemo(() => {
-    return customers.filter((customer) => {
-      const search = searchTerm.toLowerCase();
+  /* Filter customers */
 
+  const filteredCustomers = useMemo(() => {
+    const search = searchTerm.toLowerCase().trim();
+
+    return customers.filter((customer) => {
       const matchesSearch =
         customer.name.toLowerCase().includes(search) ||
         customer.email.toLowerCase().includes(search) ||
@@ -45,9 +51,8 @@ function Customers({ customers, setCustomers }) {
     });
   }, [customers, searchTerm, statusFilter]);
 
-  /*
-   * Handle new customer form fields.
-   */
+  /* Handle form input */
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -55,42 +60,67 @@ function Customers({ customers, setCustomers }) {
       ...previous,
       [name]: value,
     }));
+
+    setFormErrors((previous) => ({
+      ...previous,
+      [name]: "",
+    }));
   };
 
-  /*
-   * Add customer to the local state.
-   */
-  const handleAddCustomer = (e) => {
-    e.preventDefault();
+  /* Validate form */
+
+  const validateForm = () => {
+    const errors = {};
 
     const name = newCustomer.name.trim();
     const email = newCustomer.email.trim();
     const phone = newCustomer.phone.trim();
 
-    if (!name || !email || !phone) {
-      alert("Please fill in all required fields.");
-      return;
+    if (!name) {
+      errors.name = "Name is required.";
+    } else if (name.length < 2) {
+      errors.name = "Name must contain at least 2 characters.";
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      errors.email = "Email is required.";
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!emailRegex.test(email)) {
-      alert("Please enter a valid email address.");
-      return;
+      if (!emailRegex.test(email)) {
+        errors.email = "Please enter a valid email address.";
+      }
     }
 
-    const phoneRegex = /^[0-9]{10}$/;
+    if (!phone) {
+      errors.phone = "Phone number is required.";
+    } else {
+      const phoneRegex = /^[0-9]{10}$/;
 
-    if (!phoneRegex.test(phone)) {
-      alert("Phone number must contain exactly 10 digits.");
+      if (!phoneRegex.test(phone)) {
+        errors.phone = "Phone number must contain exactly 10 digits.";
+      }
+    }
+    return errors;
+  };
+
+  /* Add customer */
+
+  const handleAddCustomer = (e) => {
+    e.preventDefault();
+
+    const errors = validateForm();
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       return;
     }
 
     const customer = {
       id: Date.now(),
-      name,
-      email,
-      phone,
+      name: newCustomer.name.trim(),
+      email: newCustomer.email.trim(),
+      phone: newCustomer.phone.trim(),
       service: newCustomer.service,
       status: newCustomer.status,
       joinedDate: new Date().toISOString().split("T")[0],
@@ -106,21 +136,34 @@ function Customers({ customers, setCustomers }) {
       status: "Active",
     });
 
+    setFormErrors({});
     setShowAddModal(false);
+
+    setSuccessMessage(`${customer.name} was added successfully.`);
+
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
   };
 
-  const getStatusClass = (status) => {
-    if (status === "Active") {
-      return "customer-status active";
-    }
-    return "customer-status inactive";
+  /* Open Add Customer modal */
+
+  const openAddModal = () => {
+    setFormErrors({});
+    setShowAddModal(true);
   };
+
+  /* Empty state text */
+
+  const hasFilters = searchTerm.trim() !== "" || statusFilter !== "All";
 
   return (
     <div className="dashboard-layout">
       <Sidebar />
+
       <div className="dashboard-main">
         <Header />
+
         <main className="customers-content">
           {/* Page Header */}
 
@@ -131,12 +174,19 @@ function Customers({ customers, setCustomers }) {
             </div>
             <button
               className="add-customer-button"
-              onClick={() => setShowAddModal(true)}
+              type="button"
+              onClick={openAddModal}
             >
               <Plus size={18} />
               Add Customer
             </button>
           </div>
+
+          {/* Success Message */}
+
+          {successMessage && (
+            <div className="success-message">✓ {successMessage}</div>
+          )}
 
           {/* Filters */}
 
@@ -172,21 +222,45 @@ function Customers({ customers, setCustomers }) {
                 <p>{filteredCustomers.length} customers found</p>
               </div>
             </div>
-            <div className="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Customer</th>
-                    <th>Contact</th>
-                    <th>Service</th>
-                    <th>Status</th>
-                    <th>Joined Date</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredCustomers.length > 0 ? (
-                    filteredCustomers.map((customer) => (
+            {filteredCustomers.length === 0 ? (
+              <div className="customer-empty-state">
+                <div className="empty-state-icon">
+                  <Search size={24} />
+                </div>
+                <h4>
+                  {hasFilters ? "No customers found" : "No customers available"}
+                </h4>
+                <p>
+                  {hasFilters
+                    ? "Try changing your search or status filter."
+                    : "Add your first customer to get started."}
+                </p>
+                {!hasFilters && (
+                  <button
+                    className="add-customer-button"
+                    type="button"
+                    onClick={openAddModal}
+                  >
+                    <Plus size={18} />
+                    Add Customer
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Customer</th>
+                      <th>Contact</th>
+                      <th>Service</th>
+                      <th>Status</th>
+                      <th>Joined Date</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredCustomers.map((customer) => (
                       <tr key={customer.id}>
                         <td>
                           <div className="customer-cell">
@@ -218,14 +292,13 @@ function Customers({ customers, setCustomers }) {
                           </span>
                         </td>
                         <td>
-                          <span className={getStatusClass(customer.status)}>
-                            {customer.status}
-                          </span>
+                          <StatusBadge status={customer.status} />
                         </td>
                         <td>{customer.joinedDate}</td>
                         <td>
                           <button
                             className="view-customer-button"
+                            type="button"
                             onClick={() => setSelectedCustomer(customer)}
                           >
                             <Eye size={16} />
@@ -233,43 +306,30 @@ function Customers({ customers, setCustomers }) {
                           </button>
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="6" className="no-customers">
-                        No customers found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </main>
       </div>
 
       {/* Customer Details Modal */}
 
-      {selectedCustomer && (
-        <div
-          className="modal-overlay"
-          onClick={() => setSelectedCustomer(null)}
-        >
-          <div className="customer-modal" onClick={(e) => e.stopPropagation()}>
-            <button
-              className="modal-close"
-              onClick={() => setSelectedCustomer(null)}
-            >
-              <X size={20} />
-            </button>
+      <Modal
+        isOpen={Boolean(selectedCustomer)}
+        onClose={() => setSelectedCustomer(null)}
+        className="details-modal"
+      >
+        {selectedCustomer && (
+          <>
             <div className="modal-profile">
               <div className="modal-avatar">
                 {selectedCustomer.name.charAt(0)}
               </div>
               <h2>{selectedCustomer.name}</h2>
-              <span className={getStatusClass(selectedCustomer.status)}>
-                {selectedCustomer.status}
-              </span>
+              <StatusBadge status={selectedCustomer.status} />
             </div>
             <div className="customer-details">
               <div className="detail-item">
@@ -301,102 +361,93 @@ function Customers({ customers, setCustomers }) {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </>
+        )}
+      </Modal>
 
       {/* Add Customer Modal */}
 
-      {showAddModal && (
-        <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
-          <div
-            className="customer-modal add-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="add-modal-header">
-              <div>
-                <h2>Add Customer</h2>
-                <p>Enter the customer's information.</p>
-              </div>
-              <button
-                className="modal-close"
-                onClick={() => setShowAddModal(false)}
+      <Modal
+        isOpen={showAddModal}
+        onClose={() => {
+          setShowAddModal(false);
+          setFormErrors({});
+        }}
+        title="Add Customer"
+        description="Enter the customer's information."
+        className="add-modal"
+      >
+        <form onSubmit={handleAddCustomer}>
+          <Input
+            label="Full Name"
+            name="name"
+            placeholder="Enter customer name"
+            value={newCustomer.name}
+            onChange={handleInputChange}
+            error={formErrors.name}
+          />
+          <Input
+            label="Email"
+            name="email"
+            type="email"
+            placeholder="customer@example.com"
+            value={newCustomer.email}
+            onChange={handleInputChange}
+            error={formErrors.email}
+          />
+          <Input
+            label="Phone"
+            name="phone"
+            type="text"
+            placeholder="Enter 10-digit phone number"
+            value={newCustomer.phone}
+            onChange={handleInputChange}
+            error={formErrors.phone}
+          />
+          <div className="modal-form-row">
+            <div className="modal-form-group">
+              <label htmlFor="service">Service</label>
+              <select
+                id="service"
+                name="service"
+                value={newCustomer.service}
+                onChange={handleInputChange}
               >
-                <X size={20} />
-              </button>
+                <option>Basic Support</option>
+                <option>Premium Support</option>
+                <option>Technical Support</option>
+              </select>
             </div>
-            <form onSubmit={handleAddCustomer}>
-              <div className="modal-form-group">
-                <label>Full Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Enter customer name"
-                  value={newCustomer.name}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="modal-form-group">
-                <label>Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="customer@example.com"
-                  value={newCustomer.email}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="modal-form-group">
-                <label>Phone</label>
-                <input
-                  type="text"
-                  name="phone"
-                  placeholder="Enter phone number"
-                  value={newCustomer.phone}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="modal-form-row">
-                <div className="modal-form-group">
-                  <label>Service</label>
-                  <select
-                    name="service"
-                    value={newCustomer.service}
-                    onChange={handleInputChange}
-                  >
-                    <option>Basic Support</option>
-                    <option>Premium Support</option>
-                    <option>Technical Support</option>
-                  </select>
-                </div>
-                <div className="modal-form-group">
-                  <label>Status</label>
-                  <select
-                    name="status"
-                    value={newCustomer.status}
-                    onChange={handleInputChange}
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                  </select>
-                </div>
-              </div>
-              <div className="modal-actions">
-                <button
-                  type="button"
-                  className="cancel-button"
-                  onClick={() => setShowAddModal(false)}
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="save-customer-button">
-                  Add Customer
-                </button>
-              </div>
-            </form>
+            <div className="modal-form-group">
+              <label htmlFor="status">Status</label>
+              <select
+                id="status"
+                name="status"
+                value={newCustomer.status}
+                onChange={handleInputChange}
+              >
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
           </div>
-        </div>
-      )}
+          <div className="modal-actions">
+            <button
+              type="button"
+              className="cancel-button"
+              onClick={() => {
+                setShowAddModal(false);
+                setFormErrors({});
+              }}
+            >
+              Cancel
+            </button>
+            <button type="submit" className="save-customer-button">
+              Add Customer
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

@@ -1,28 +1,36 @@
+import { useEffect, useState } from "react";
 import { Users, Briefcase, Clock, DollarSign } from "lucide-react";
+
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import SummaryCard from "../components/SummaryCard";
 import ServiceRequestsTable from "../components/ServiceRequestsTable";
-import { serviceRequests } from "../data/mockData";
+
+import { dashboardStats } from "../data/mockData";
 
 function Dashboard({ customers }) {
-  const totalCustomers = customers.length;
+  const [selectedPeriod, setSelectedPeriod] = useState("Today");
+  const [isLoading, setIsLoading] = useState(true);
 
-  const activeServices = customers.filter(
-    (customer) => customer.status === "Active",
-  ).length;
+  const stats = dashboardStats[selectedPeriod];
 
-  const pendingRequests = serviceRequests.filter(
-    (request) => request.status === "Pending",
-  ).length;
+  useEffect(() => {
+    setIsLoading(true);
 
-  const revenue = 24580;
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [selectedPeriod]);
 
   return (
     <div className="dashboard-layout">
       <Sidebar />
+
       <div className="dashboard-main">
         <Header />
+
         <main className="dashboard-content">
           {/* Welcome Section */}
 
@@ -31,44 +39,72 @@ function Dashboard({ customers }) {
               <h1>Dashboard</h1>
               <p>Welcome back! Here's what's happening today.</p>
             </div>
+
+            {/* Date Filter */}
+
+            <div className="dashboard-filter">
+              <label htmlFor="period-filter">Period</label>
+              <select
+                id="period-filter"
+                value={selectedPeriod}
+                onChange={(e) => setSelectedPeriod(e.target.value)}
+              >
+                <option value="Today">Today</option>
+                <option value="This Week">This Week</option>
+                <option value="This Month">This Month</option>
+              </select>
+            </div>
           </div>
 
-          {/* Summary Cards */}
+          {/* Loading State */}
 
-          <div className="summary-grid">
-            <SummaryCard
-              title="Total Customers"
-              value={totalCustomers}
-              icon={<Users size={22} />}
-              trend="+12.5%"
-              description="from last month"
-            />
-            <SummaryCard
-              title="Active Services"
-              value={activeServices}
-              icon={<Briefcase size={22} />}
-              trend="+8.2%"
-              description="from last month"
-            />
-            <SummaryCard
-              title="Pending Requests"
-              value={pendingRequests}
-              icon={<Clock size={22} />}
-              trend="-4.3%"
-              description="from last month"
-            />
-            <SummaryCard
-              title="Revenue"
-              value={`$${revenue.toLocaleString()}`}
-              icon={<DollarSign size={22} />}
-              trend="+15.8%"
-              description="from last month"
-            />
-          </div>
+          {isLoading ? (
+            <div className="dashboard-loading">
+              <p>Loading dashboard...</p>
+            </div>
+          ) : (
+            <>
+              {/* Summary Cards */}
 
-          {/* Recent Requests */}
+              <div className="summary-grid">
+                <SummaryCard
+                  title="Total Customers"
+                  value={stats.totalCustomers}
+                  icon={<Users size={22} />}
+                  trend="+12.5%"
+                  description={selectedPeriod}
+                />
+                <SummaryCard
+                  title="Active Services"
+                  value={stats.activeServices}
+                  icon={<Briefcase size={22} />}
+                  trend="+8.2%"
+                  description={selectedPeriod}
+                />
+                <SummaryCard
+                  title="Pending Requests"
+                  value={stats.pendingRequests}
+                  icon={<Clock size={22} />}
+                  trend="-4.3%"
+                  description={selectedPeriod}
+                />
+                <SummaryCard
+                  title="Revenue"
+                  value={`$${stats.revenue.toLocaleString()}`}
+                  icon={<DollarSign size={22} />}
+                  trend="+15.8%"
+                  description={selectedPeriod}
+                />
+              </div>
 
-          <ServiceRequestsTable />
+              {/* Recent Requests */}
+
+              <ServiceRequestsTable
+                customers={customers}
+                selectedPeriod={selectedPeriod}
+              />
+            </>
+          )}
         </main>
       </div>
     </div>
