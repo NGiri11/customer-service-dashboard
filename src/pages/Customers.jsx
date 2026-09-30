@@ -4,6 +4,7 @@ import {
   Search,
   Filter,
   Eye,
+  Trash2,
   Mail,
   Phone,
   Briefcase,
@@ -20,10 +21,11 @@ function Customers({ customers, setCustomers }) {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   const [showAddModal, setShowAddModal] = useState(false);
+  const [customerToDelete, setCustomerToDelete] = useState(null);
 
   const [successMessage, setSuccessMessage] = useState("");
-
   const [formErrors, setFormErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [newCustomer, setNewCustomer] = useState({
     name: "",
@@ -39,10 +41,14 @@ function Customers({ customers, setCustomers }) {
     const search = searchTerm.toLowerCase().trim();
 
     return customers.filter((customer) => {
+      const name = customer.name?.toString().toLowerCase() || "";
+      const email = customer.email?.toString().toLowerCase() || "";
+      const phone = customer.phone?.toString() || "";
+
       const matchesSearch =
-        customer.name.toLowerCase().includes(search) ||
-        customer.email.toLowerCase().includes(search) ||
-        customer.phone.includes(search);
+        name.includes(search) ||
+        email.includes(search) ||
+        phone.includes(search);
 
       const matchesStatus =
         statusFilter === "All" || customer.status === statusFilter;
@@ -76,11 +82,15 @@ function Customers({ customers, setCustomers }) {
     const email = newCustomer.email.trim();
     const phone = newCustomer.phone.trim();
 
+    /* Name validation */
+
     if (!name) {
       errors.name = "Name is required.";
     } else if (name.length < 2) {
       errors.name = "Name must contain at least 2 characters.";
     }
+
+    /* Email validation */
 
     if (!email) {
       errors.email = "Email is required.";
@@ -89,8 +99,19 @@ function Customers({ customers, setCustomers }) {
 
       if (!emailRegex.test(email)) {
         errors.email = "Please enter a valid email address.";
+      } else {
+        const emailExists = customers.some(
+          (customer) =>
+            customer.email?.trim().toLowerCase() === email.toLowerCase(),
+        );
+
+        if (emailExists) {
+          errors.email = "A customer with this email already exists.";
+        }
       }
     }
+
+    /* Phone validation */
 
     if (!phone) {
       errors.phone = "Phone number is required.";
@@ -101,7 +122,23 @@ function Customers({ customers, setCustomers }) {
         errors.phone = "Phone number must contain exactly 10 digits.";
       }
     }
+
     return errors;
+  };
+
+  /* Reset customer form */
+
+  const resetCustomerForm = () => {
+    setNewCustomer({
+      name: "",
+      email: "",
+      phone: "",
+      service: "Basic Support",
+      status: "Active",
+    });
+
+    setFormErrors({});
+    setIsSubmitting(false);
   };
 
   /* Add customer */
@@ -109,10 +146,21 @@ function Customers({ customers, setCustomers }) {
   const handleAddCustomer = (e) => {
     e.preventDefault();
 
+    /* Prevent multiple submissions */
+
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
     const errors = validateForm();
+
+    /* Stop submission if validation fails */
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
+      setIsSubmitting(false);
       return;
     }
 
@@ -126,18 +174,17 @@ function Customers({ customers, setCustomers }) {
       joinedDate: new Date().toISOString().split("T")[0],
     };
 
+    /* Add customer to shared state */
+
     setCustomers((previous) => [...previous, customer]);
 
-    setNewCustomer({
-      name: "",
-      email: "",
-      phone: "",
-      service: "Basic Support",
-      status: "Active",
-    });
+    /* Reset form */
 
-    setFormErrors({});
+    resetCustomerForm();
+
     setShowAddModal(false);
+
+    /* Success feedback */
 
     setSuccessMessage(`${customer.name} was added successfully.`);
 
@@ -149,8 +196,57 @@ function Customers({ customers, setCustomers }) {
   /* Open Add Customer modal */
 
   const openAddModal = () => {
-    setFormErrors({});
+    resetCustomerForm();
     setShowAddModal(true);
+  };
+
+  /* Close Add Customer modal */
+
+  const closeAddModal = () => {
+    resetCustomerForm();
+    setShowAddModal(false);
+  };
+
+  /* Open Delete Confirmation */
+
+  const openDeleteConfirmation = (customer) => {
+    setCustomerToDelete(customer);
+  };
+
+  /* Close Delete Confirmation */
+
+  const closeDeleteConfirmation = () => {
+    setCustomerToDelete(null);
+  };
+
+  /* Delete customer */
+
+  const handleDeleteCustomer = () => {
+    if (!customerToDelete) {
+      return;
+    }
+
+    const deletedCustomerName = customerToDelete.name || "Customer";
+
+    setCustomers((previous) =>
+      previous.filter((customer) => customer.id !== customerToDelete.id),
+    );
+
+    /* Close details modal if the deleted customer was selected */
+
+    if (selectedCustomer?.id === customerToDelete.id) {
+      setSelectedCustomer(null);
+    }
+
+    setCustomerToDelete(null);
+
+    /* Success feedback */
+
+    setSuccessMessage(`${deletedCustomerName} was deleted successfully.`);
+
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
   };
 
   /* Empty state text */
@@ -196,15 +292,18 @@ function Customers({ customers, setCustomers }) {
               <input
                 type="text"
                 placeholder="Search customers..."
+                aria-label="Search customers"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <div className="status-filter">
               <Filter size={17} />
+
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
+                aria-label="Filter customers by status"
               >
                 <option value="All">All Status</option>
                 <option value="Active">Active</option>
@@ -222,7 +321,10 @@ function Customers({ customers, setCustomers }) {
                 <p>{filteredCustomers.length} customers found</p>
               </div>
             </div>
+
             {filteredCustomers.length === 0 ? (
+              /* Empty / No Results State */
+
               <div className="customer-empty-state">
                 <div className="empty-state-icon">
                   <Search size={24} />
@@ -247,6 +349,8 @@ function Customers({ customers, setCustomers }) {
                 )}
               </div>
             ) : (
+              /* Customer Table */
+
               <div className="table-container">
                 <table>
                   <thead>
@@ -260,53 +364,82 @@ function Customers({ customers, setCustomers }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredCustomers.map((customer) => (
-                      <tr key={customer.id}>
-                        <td>
-                          <div className="customer-cell">
-                            <div className="customer-avatar">
-                              {customer.name.charAt(0)}
+                    {filteredCustomers.map((customer) => {
+                      const customerName = customer.name || "Unknown Customer";
+
+                      const customerEmail =
+                        customer.email || "No email available";
+
+                      const customerPhone =
+                        customer.phone || "No phone available";
+
+                      const customerService =
+                        customer.service || "Service not specified";
+
+                      const customerStatus = customer.status || "Unknown";
+
+                      const customerJoinedDate =
+                        customer.joinedDate || "Not available";
+
+                      return (
+                        <tr key={customer.id}>
+                          <td>
+                            <div className="customer-cell">
+                              <div className="customer-avatar">
+                                {customerName.charAt(0).toUpperCase()}
+                              </div>
+                              <div className="customer-name">
+                                <strong>{customerName}</strong>
+                                <span>ID #{customer.id}</span>
+                              </div>
                             </div>
-                            <div className="customer-name">
-                              <strong>{customer.name}</strong>
-                              <span>ID #{customer.id}</span>
+                          </td>
+                          <td>
+                            <div className="contact-info">
+                              <span>
+                                <Mail size={14} />
+                                {customerEmail}
+                              </span>
+                              <span>
+                                <Phone size={14} />
+                                {customerPhone}
+                              </span>
                             </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="contact-info">
-                            <span>
-                              <Mail size={14} />
-                              {customer.email}
+                          </td>
+                          <td>
+                            <span className="service-name">
+                              <Briefcase size={14} />
+                              {customerService}
                             </span>
-                            <span>
-                              <Phone size={14} />
-                              {customer.phone}
-                            </span>
-                          </div>
-                        </td>
-                        <td>
-                          <span className="service-name">
-                            <Briefcase size={14} />
-                            {customer.service}
-                          </span>
-                        </td>
-                        <td>
-                          <StatusBadge status={customer.status} />
-                        </td>
-                        <td>{customer.joinedDate}</td>
-                        <td>
-                          <button
-                            className="view-customer-button"
-                            type="button"
-                            onClick={() => setSelectedCustomer(customer)}
-                          >
-                            <Eye size={16} />
-                            View
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                          </td>
+                          <td>
+                            <StatusBadge status={customerStatus} />
+                          </td>
+                          <td>{customerJoinedDate}</td>
+                          <td>
+                            <div className="customer-action-buttons">
+                              <button
+                                className="view-customer-button"
+                                type="button"
+                                onClick={() => setSelectedCustomer(customer)}
+                              >
+                                <Eye size={16} />
+                                View
+                              </button>
+                              <button
+                                className="delete-customer-button"
+                                type="button"
+                                onClick={() => openDeleteConfirmation(customer)}
+                                aria-label={`Delete ${customerName}`}
+                              >
+                                <Trash2 size={16} />
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -326,31 +459,37 @@ function Customers({ customers, setCustomers }) {
           <>
             <div className="modal-profile">
               <div className="modal-avatar">
-                {selectedCustomer.name.charAt(0)}
+                {(selectedCustomer.name || "U").charAt(0).toUpperCase()}
               </div>
-              <h2>{selectedCustomer.name}</h2>
-              <StatusBadge status={selectedCustomer.status} />
+              <h2>{selectedCustomer.name || "Unknown Customer"}</h2>
+              <StatusBadge status={selectedCustomer.status || "Unknown"} />
             </div>
             <div className="customer-details">
               <div className="detail-item">
                 <Mail size={18} />
                 <div>
                   <span>Email</span>
-                  <strong>{selectedCustomer.email}</strong>
+                  <strong>
+                    {selectedCustomer.email || "No email available"}
+                  </strong>
                 </div>
               </div>
               <div className="detail-item">
                 <Phone size={18} />
                 <div>
                   <span>Phone</span>
-                  <strong>{selectedCustomer.phone}</strong>
+                  <strong>
+                    {selectedCustomer.phone || "No phone available"}
+                  </strong>
                 </div>
               </div>
               <div className="detail-item">
                 <Briefcase size={18} />
                 <div>
                   <span>Service</span>
-                  <strong>{selectedCustomer.service}</strong>
+                  <strong>
+                    {selectedCustomer.service || "Service not specified"}
+                  </strong>
                 </div>
               </div>
               <div className="detail-item">
@@ -369,10 +508,7 @@ function Customers({ customers, setCustomers }) {
 
       <Modal
         isOpen={showAddModal}
-        onClose={() => {
-          setShowAddModal(false);
-          setFormErrors({});
-        }}
+        onClose={closeAddModal}
         title="Add Customer"
         description="Enter the customer's information."
         className="add-modal"
@@ -435,18 +571,57 @@ function Customers({ customers, setCustomers }) {
             <button
               type="button"
               className="cancel-button"
-              onClick={() => {
-                setShowAddModal(false);
-                setFormErrors({});
-              }}
+              onClick={closeAddModal}
+              disabled={isSubmitting}
             >
               Cancel
             </button>
-            <button type="submit" className="save-customer-button">
-              Add Customer
+            <button
+              type="submit"
+              className="save-customer-button"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Adding..." : "Add Customer"}
             </button>
           </div>
         </form>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+
+      <Modal
+        isOpen={Boolean(customerToDelete)}
+        onClose={closeDeleteConfirmation}
+        title="Delete Customer?"
+        description={
+          customerToDelete
+            ? `Are you sure you want to delete ${
+                customerToDelete.name || "this customer"
+              }?`
+            : ""
+        }
+        className="delete-modal"
+      >
+        <div className="delete-confirmation">
+          <p>This action will remove the customer from the current session.</p>
+          <div className="modal-actions">
+            <button
+              type="button"
+              className="cancel-button"
+              onClick={closeDeleteConfirmation}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="delete-confirm-button"
+              onClick={handleDeleteCustomer}
+            >
+              <Trash2 size={17} />
+              Delete Customer
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

@@ -57,9 +57,6 @@ function ServiceRequestsTable() {
           <h3>Recent Service Requests</h3>
           <p>Latest customer service activity</p>
         </div>
-        <button className="view-all-button" type="button">
-          View All
-        </button>
       </div>
 
       {/* Filters */}

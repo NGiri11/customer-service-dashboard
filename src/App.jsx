@@ -29,7 +29,7 @@ function App() {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <Dashboard customers={customers} />
+              <Dashboard />
             </ProtectedRoute>
           }
         />

@@ -11,7 +11,9 @@ body {
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font-family: inherit;
 }
 
@@ -202,10 +204,6 @@ input {
   padding: 0 12px 10px;
 }
 
-.settings-title {
-  margin-top: 30px;
-}
-
 .nav-item {
   display: flex;
   align-items: center;
@@ -354,6 +352,10 @@ input {
 
 .welcome-section {
   margin-bottom: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
 }
 
 .welcome-section h1 {
@@ -459,15 +461,6 @@ input {
 .table-header p {
   font-size: 12px;
   color: #9ca3af;
-}
-
-.view-all-button {
-  border: none;
-  background: transparent;
-  color: #2563eb;
-  font-size: 13px;
-  cursor: pointer;
-  font-weight: 600;
 }
 
 .table-container {
@@ -584,6 +577,33 @@ td {
   .header-search {
     width: 180px;
   }
+
+  .welcome-section {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dashboard-filter {
+    width: 100%;
+  }
+
+  .dashboard-filter select {
+    flex: 1;
+  }
+
+  .request-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .request-search {
+    max-width: none;
+  }
+
+  .request-status-filter,
+  .sort-button {
+    width: 100%;
+  }
 }
 
 @media (max-width: 600px) {
@@ -597,37 +617,6 @@ td {
 
   .header-search {
     width: 150px;
-  }
-}
-
-@media (max-width: 768px) {
-  .welcome-section {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .dashboard-filter {
-    width: 100%;
-  }
-
-  .dashboard-filter select {
-    flex: 1;
-  }
-}
-
-@media (max-width: 768px) {
-  .request-filters {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .request-search {
-    max-width: none;
-  }
-
-  .request-status-filter,
-  .sort-button {
-    width: 100%;
   }
 }
 
@@ -1052,59 +1041,15 @@ td {
   background: #1d4ed8;
 }
 
+.save-customer-button:disabled,
+.cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* =========================
-   CUSTOMER RESPONSIVE
+   DASHBOARD FILTER
 ========================= */
-
-@media (max-width: 900px) {
-  .customers-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .customer-search {
-    width: 100%;
-  }
-}
-
-@media (max-width: 600px) {
-  .customers-content {
-    padding: 20px;
-  }
-
-  .customers-page-header {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .modal-form-row {
-    grid-template-columns: 1fr;
-  }
-}
-
-.sidebar-settings {
-  width: 100%;
-  border: none;
-  background: transparent;
-  text-align: left;
-  font-family: inherit;
-  cursor: default;
-}
-
-.sidebar-settings:hover {
-  background: #1f2937;
-  color: #9ca3af;
-}
-
-/* Dashboard Filter */
-
-.welcome-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-}
 
 .dashboard-filter {
   display: flex;
@@ -1134,7 +1079,9 @@ td {
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
-/* Dashboard Loading State */
+/* =========================
+   DASHBOARD LOADING STATE
+========================= */
 
 .dashboard-loading {
   min-height: 250px;
@@ -1148,7 +1095,9 @@ td {
   font-size: 15px;
 }
 
-/* Service Request Filters */
+/* =========================
+   SERVICE REQUEST FILTERS
+========================= */
 
 .request-filters {
   display: flex;
@@ -1220,7 +1169,9 @@ td {
   background: #f9fafb;
 }
 
-/* Empty State */
+/* =========================
+   EMPTY STATES
+========================= */
 
 .table-empty-state {
   min-height: 220px;
@@ -1256,7 +1207,9 @@ td {
   color: #6b7280;
 }
 
-/* Customer Success Message */
+/* =========================
+   CUSTOMER SUCCESS / VALIDATION
+========================= */
 
 .success-message {
   margin-bottom: 18px;
@@ -1269,15 +1222,11 @@ td {
   font-weight: 500;
 }
 
-/* Form Validation */
-
 .form-error {
   margin-top: 5px;
   color: #dc2626;
   font-size: 12px;
 }
-
-/* Customer Empty State */
 
 .customer-empty-state {
   min-height: 260px;
@@ -1305,11 +1254,9 @@ td {
   margin-top: 4px;
 }
 
-/* =========================================
-   DAY 2 RESPONSIVE DESIGN
-   ========================================= */
-
-/* Tablet */
+/* =========================
+   TABLET RESPONSIVE
+========================= */
 
 @media (max-width: 1024px) {
   .dashboard-content,
@@ -1340,11 +1287,11 @@ td {
   }
 }
 
-/* Smaller tablet / large mobile */
+/* =========================
+   SMALLER TABLET
+========================= */
 
 @media (max-width: 768px) {
-  /* Main Layout */
-
   .dashboard-main {
     width: 100%;
     min-width: 0;
@@ -1505,7 +1452,33 @@ td {
   }
 }
 
-/* Mobile */
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .top-header {
+    padding: 0 15px;
+  }
+
+  .header-search {
+    width: 150px;
+  }
+
+  .customers-content {
+    padding: 20px;
+  }
+
+  .customers-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 15px;
+  }
+}
 
 @media (max-width: 480px) {
   .dashboard-content,
@@ -1555,4 +1528,70 @@ td {
   .modal-profile h2 {
     font-size: 20px;
   }
+}
+
+/* =========================
+   CUSTOMER ACTION BUTTONS
+========================= */
+
+.customer-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.delete-customer-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #fff;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-customer-button:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+
+.delete-customer-button:focus-visible,
+.view-customer-button:focus-visible,
+.delete-confirm-button:focus-visible,
+.cancel-button:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.delete-confirm-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.delete-confirm-button:hover {
+  background: #b91c1c;
+}
+
+.delete-confirmation p {
+  margin: 0 0 20px;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.6;
 }

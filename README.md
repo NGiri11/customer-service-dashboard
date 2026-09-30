@@ -2,10 +2,7 @@
 
 A responsive customer service management dashboard built using React and Vite.
 
-This project was developed in two stages:
-
-- Day 1: Built the core dashboard, login screen, customer management interface, and mock data.
-- Day 2: Added interactions, validation, reusable components, UI states, filtering, sorting, and responsive improvements.
+This project was developed as a three-day frontend assignment. It focuses on building a functional customer service dashboard with mock data, reusable React components, validation, UI states, responsive design, and end-to-end frontend interactions.
 
 The application is completely frontend-based and uses mock JavaScript data. No backend or API is required.
 
@@ -14,6 +11,7 @@ The application is completely frontend-based and uses mock JavaScript data. No b
 ## Live Project
 
 GitHub Repository:
+
 https://github.com/NGiri11/customer-service-dashboard
 
 ---
@@ -27,14 +25,23 @@ The application provides:
 - Frontend login
 - Protected dashboard routes
 - Dashboard summary statistics
+- Dashboard period filtering
+- Service request search
+- Service request status filtering
+- Service request sorting
 - Customer management
 - Customer search and filtering
-- Service request management
 - Add customer functionality
+- Customer form validation
+- Duplicate email validation
 - Customer details view
-- Form validation
+- Delete customer functionality
+- Delete confirmation
+- Loading states
+- Empty states
+- Validation and error states
+- Success feedback
 - Responsive design
-- Loading and empty states
 - Reusable React components
 
 ---
@@ -57,8 +64,6 @@ Build the basic customer service dashboard with:
 - Customer details
 - Mock data
 
----
-
 ## Login Screen
 
 The application starts with a login page.
@@ -74,9 +79,7 @@ The application starts with a login page.
 
 No backend authentication is used.
 
-The login state is stored using browser localStorage.
-
----
+The login state is stored using browser `localStorage`.
 
 ## Dashboard
 
@@ -93,8 +96,6 @@ The dashboard contains four summary cards:
 
 The dashboard also contains a recent service requests table.
 
----
-
 ## Recent Service Requests
 
 The service request table displays:
@@ -110,8 +111,6 @@ Example service request statuses:
 - Pending
 - In Progress
 - Completed
-
----
 
 ## Customer Management
 
@@ -153,8 +152,6 @@ Improve the Day-1 application by adding:
 - Responsive improvements
 - Cleaner component structure
 
----
-
 ## Improved Login
 
 The login functionality was enhanced with validation.
@@ -172,30 +169,28 @@ Validation errors are displayed clearly to the user.
 
 ### Login Flow
 
+```text
 Login
-↓
+  ↓
 Validate Email & Password
-↓
+  ↓
 Successful Login
-↓
+  ↓
 Dashboard
-
----
+```
 
 ## Protected Routes
 
-Protected routes were added using a reusable ProtectedRoute component.
+Protected routes were added using a reusable `ProtectedRoute` component.
 
 Users who are not logged in cannot directly access:
 
-/dashboard
-/customers
+- `/dashboard`
+- `/customers`
 
 They are redirected to:
 
-/login
-
----
+- `/login`
 
 ## Logout
 
@@ -203,10 +198,8 @@ A logout option is available in the sidebar.
 
 When the user logs out:
 
-1. The login state is removed from localStorage.
+1. The login state is removed from `localStorage`.
 2. The user is redirected to the login page.
-
----
 
 ## Dynamic Dashboard
 
@@ -222,17 +215,15 @@ The four dashboard cards update dynamically based on the selected period.
 
 All values are stored as mock data.
 
----
-
 ## Loading State
 
 A loading state was added to the dashboard.
 
 When the selected dashboard period changes, the application displays:
 
+```text
 Loading dashboard...
-
----
+```
 
 ## Service Request Search
 
@@ -243,8 +234,6 @@ Users can search by:
 - Customer name
 - Service
 - Request
-
----
 
 ## Service Request Status Filter
 
@@ -257,8 +246,6 @@ Available options:
 - In Progress
 - Completed
 
----
-
 ## Service Request Sorting
 
 The service request table supports basic date sorting.
@@ -268,21 +255,19 @@ Users can switch between:
 - Newest
 - Oldest
 
----
-
 ## Empty States
 
 The application displays an empty state when no service requests match the current search or filter.
 
 Example:
 
+```text
 No service requests found
 
 Try changing your search or status filter.
+```
 
 A similar empty state is available on the Customers page.
-
----
 
 ## Improved Customer Management
 
@@ -309,8 +294,6 @@ Customers can be filtered by:
 - Active
 - Inactive
 
----
-
 ## Add Customer
 
 An Add Customer button opens a modal containing a customer form.
@@ -320,9 +303,8 @@ The form includes:
 - Name
 - Email
 - Phone
+- Service
 - Status
-
----
 
 ## Customer Form Validation
 
@@ -330,7 +312,7 @@ The Add Customer form performs basic validation.
 
 Validation errors are displayed directly below the relevant fields.
 
----
+The form also checks for duplicate customer email addresses.
 
 ## Successful Customer Submission
 
@@ -339,14 +321,9 @@ After successfully adding a customer:
 - The customer is added to the mock customer list.
 - The customer table updates immediately.
 - A success message is displayed.
-
-Example:
-
-Customer added successfully!
+- The newly added customer can be searched and filtered.
 
 New customers are not persisted after a browser refresh because the application uses mock data and React state.
-
----
 
 ## Customer Details
 
@@ -356,51 +333,76 @@ The details view displays information about the selected customer without requir
 
 ---
 
-# Reusable Components
+# Day 3 – Finalization & Review
 
-Reusable components were introduced to reduce duplicated UI code.
+## Day 3 Objective
 
-Current reusable components include:
+Finalize the frontend application with:
 
-- Header.jsx
-- Input.jsx
-- Modal.jsx
-- ProtectedRoute.jsx
-- ServiceRequestsTable.jsx
-- Sidebar.jsx
-- StatusBadge.jsx
-- SummaryCard.jsx
+- End-to-end functionality
+- Consistent UI/UX
+- Edge-case handling
+- Delete customer functionality
+- Improved validation
+- Responsive behavior
+- Code quality
+- Final testing
+- Documentation
 
-### Component Responsibilities
+## Delete Customer
 
-| Component            | Purpose                               |
-| -------------------- | ------------------------------------- |
-| Header               | Application top navigation/header     |
-| Input                | Reusable form input                   |
-| Modal                | Reusable modal/dialog                 |
-| ProtectedRoute       | Protects authenticated routes         |
-| ServiceRequestsTable | Displays and manages service requests |
-| Sidebar              | Dashboard navigation                  |
-| StatusBadge          | Displays status labels                |
-| SummaryCard          | Displays dashboard statistics         |
+Customers can be deleted from the Customers page.
 
----
+The delete flow includes:
 
-# UI States
+1. Click the Delete button.
+2. A confirmation modal opens.
+3. The user can cancel the action.
+4. The user can confirm deletion.
+5. The customer is removed from the current React state.
+6. A success message is displayed.
 
-The application includes:
+If the deleted customer is currently open in the details modal, the details modal is closed automatically.
 
-- Loading state
-- Empty state
-- Validation state
-- Success state
-- No search results state
+Deletion is session-only because the project does not use a backend or persistent database.
 
----
+## Edge-Case Handling
 
-# Responsive Design
+The application handles several common edge cases:
 
-The application is responsive and designed to work across:
+- Invalid login email
+- Missing login password
+- Invalid customer email
+- Missing required customer fields
+- Duplicate customer email
+- Invalid phone number
+- Empty search results
+- Filters with no matching records
+- Cancelled customer creation
+- Cancelled customer deletion
+- Multiple form submissions
+- Missing optional customer fields
+- Long customer information
+- Empty customer dataset
+
+## Consistent UI/UX
+
+The final version provides consistent:
+
+- Spacing
+- Typography
+- Buttons
+- Forms
+- Status badges
+- Modals
+- Success messages
+- Empty states
+- Loading states
+- Responsive layouts
+
+## Responsive Design
+
+The application is designed to work across:
 
 - Desktop
 - Tablet
@@ -418,36 +420,80 @@ Responsive improvements include:
 
 ---
 
+# Reusable Components
+
+Reusable components were introduced to reduce duplicated UI code.
+
+Current reusable components include:
+
+- `Header.jsx`
+- `Input.jsx`
+- `Modal.jsx`
+- `ProtectedRoute.jsx`
+- `ServiceRequestsTable.jsx`
+- `Sidebar.jsx`
+- `StatusBadge.jsx`
+- `SummaryCard.jsx`
+
+### Component Responsibilities
+
+| Component | Purpose |
+|---|---|
+| Header | Application top navigation/header |
+| Input | Reusable form input |
+| Modal | Reusable modal/dialog |
+| ProtectedRoute | Protects authenticated routes |
+| ServiceRequestsTable | Displays and manages service requests |
+| Sidebar | Dashboard navigation |
+| StatusBadge | Displays status labels |
+| SummaryCard | Displays dashboard statistics |
+
+---
+
+# UI States
+
+The application includes:
+
+- Loading state
+- Empty state
+- Validation/error state
+- Success state
+- No search results state
+- Delete confirmation state
+
+---
+
 # Project Structure
 
+```text
 customer-service-dashboard/
 │
 ├── public/
 │
 ├── src/
-│ ├── assets/
-│ │
-│ ├── components/
-│ │ ├── Header.jsx
-│ │ ├── Input.jsx
-│ │ ├── Modal.jsx
-│ │ ├── ProtectedRoute.jsx
-│ │ ├── ServiceRequestsTable.jsx
-│ │ ├── Sidebar.jsx
-│ │ ├── StatusBadge.jsx
-│ │ └── SummaryCard.jsx
-│ │
-│ ├── data/
-│ │ └── mockData.js
-│ │
-│ ├── pages/
-│ │ ├── Customers.jsx
-│ │ ├── Dashboard.jsx
-│ │ └── Login.jsx
-│ │
-│ ├── App.jsx
-│ ├── index.css
-│ └── main.jsx
+│   ├── assets/
+│   │
+│   ├── components/
+│   │   ├── Header.jsx
+│   │   ├── Input.jsx
+│   │   ├── Modal.jsx
+│   │   ├── ProtectedRoute.jsx
+│   │   ├── ServiceRequestsTable.jsx
+│   │   ├── Sidebar.jsx
+│   │   ├── StatusBadge.jsx
+│   │   └── SummaryCard.jsx
+│   │
+│   ├── data/
+│   │   └── mockData.js
+│   │
+│   ├── pages/
+│   │   ├── Customers.jsx
+│   │   ├── Dashboard.jsx
+│   │   └── Login.jsx
+│   │
+│   ├── App.jsx
+│   ├── index.css
+│   └── main.jsx
 │
 ├── .gitignore
 ├── eslint.config.js
@@ -456,6 +502,7 @@ customer-service-dashboard/
 ├── package.json
 ├── README.md
 └── vite.config.js
+```
 
 ---
 
@@ -482,7 +529,7 @@ customer-service-dashboard/
 ## Authentication
 
 - Frontend-only authentication
-- Browser localStorage
+- Browser `localStorage`
 
 ---
 
@@ -490,19 +537,27 @@ customer-service-dashboard/
 
 Clone the repository:
 
+```bash
 git clone https://github.com/NGiri11/customer-service-dashboard.git
+```
 
 Navigate to the project:
 
+```bash
 cd customer-service-dashboard
+```
 
 Install dependencies:
 
+```bash
 npm install
+```
 
 Start the development server:
 
+```bash
 npm run dev
+```
 
 ---
 
@@ -510,61 +565,85 @@ npm run dev
 
 To create a production build:
 
+```bash
 npm run build
+```
 
-The project successfully builds using Vite.
+The project builds using Vite.
+
+---
+
+# Code Quality
+
+The project uses ESLint for code quality checks.
+
+Run:
+
+```bash
+npm run lint
+```
+
+The final version was checked for lint errors before submission.
 
 ---
 
 # Application Flow
 
+```text
 Login
-↓
+  ↓
 Email & Password
-↓
+  ↓
 Validation
-↓
+  ↓
 Dashboard
-├── Summary Cards
-├── Period Filter
-└── Service Requests
-├── Search
-├── Status Filter
-└── Sort
-
-Dashboard
-└── Customers
-├── Search
-├── Filter
-├── Add Customer
-└── View Details
+  ├── Summary Cards
+  ├── Period Filter
+  └── Service Requests
+      ├── Search
+      ├── Status Filter
+      └── Sort
+  ↓
+Customers
+  ├── Search
+  ├── Status Filter
+  ├── Add Customer
+  ├── View Details
+  └── Delete Customer
+      └── Confirmation
+  ↓
+Logout
+  ↓
+Login
+```
 
 ---
 
 # Assignment Requirements
 
-| Requirement            |    Day 1     |         Day 2          |
-| ---------------------- | :----------: | :--------------------: |
-| Login Screen           |     Yes      |          Yes           |
-| Email & Password       |     Yes      |          Yes           |
-| Login Validation       |    Basic     |        Enhanced        |
-| Dashboard              |     Yes      |          Yes           |
-| Sidebar Navigation     |     Yes      |          Yes           |
-| Header                 |     Yes      |          Yes           |
-| Summary Cards          |     Yes      |        Dynamic         |
-| Recent Requests        |     Yes      | Search / Filter / Sort |
-| Customer List          |     Yes      |          Yes           |
-| Customer Search        |     Yes      |          Yes           |
-| Customer Status Filter |     Yes      |          Yes           |
-| Add Customer           |    Basic     |   Modal + Validation   |
-| Customer Details       |     Yes      |         Modal          |
-| Mock Data              |     Yes      |          Yes           |
-| Loading State          |      No      |          Yes           |
-| Empty State            |      No      |          Yes           |
-| Success State          |      No      |          Yes           |
-| Reusable Components    |    Basic     |          Yes           |
-| Responsive Design      |    Basic     |        Improved        |
-| Backend / API          | Not Required |      Not Required      |
+| Requirement | Day 1 | Day 2 | Day 3 |
+|---|:---:|:---:|:---:|
+| Login Screen | Yes | Yes | Yes |
+| Email & Password | Yes | Yes | Yes |
+| Login Validation | Basic | Enhanced | Final |
+| Dashboard | Yes | Yes | Yes |
+| Sidebar Navigation | Yes | Yes | Yes |
+| Header | Yes | Yes | Yes |
+| Summary Cards | Yes | Dynamic | Dynamic |
+| Recent Requests | Yes | Search / Filter / Sort | Final |
+| Customer List | Yes | Yes | Yes |
+| Customer Search | Yes | Yes | Yes |
+| Customer Status Filter | Yes | Yes | Yes |
+| Add Customer | Basic | Modal + Validation | Final |
+| Customer Details | Yes | Modal | Modal |
+| Delete Customer | No | No | Yes |
+| Loading State | No | Yes | Yes |
+| Empty State | No | Yes | Yes |
+| Success State | No | Yes | Yes |
+| Validation / Error States | Basic | Yes | Enhanced |
+| Reusable Components | Basic | Yes | Final |
+| Responsive Design | Basic | Improved | Final |
+| Backend / API | Not Required | Not Required | Not Required |
 
 ---
 
@@ -574,7 +653,9 @@ This project intentionally does not use a backend or API.
 
 Mock data is maintained in:
 
+```text
 src/data/mockData.js
+```
 
 The project contains mock data for:
 
@@ -588,9 +669,9 @@ Dashboard statistics are available for:
 - This Week
 - This Month
 
-Customer state is shared through React state in App.jsx.
+Customer state is shared through React state in `App.jsx`.
 
-Newly added customers are available during the current session but are reset when the page is refreshed.
+Newly added customers and deleted customers are reflected immediately during the current session but are reset when the page is refreshed.
 
 ---
 
@@ -613,6 +694,88 @@ These are intentionally outside the scope of this frontend assignment.
 
 ---
 
+# Testing Checklist
+
+The final application was tested for the following workflows:
+
+### Authentication
+
+- Login with valid input
+- Login with missing fields
+- Login with invalid email
+- Login with short password
+- Protected dashboard route
+- Protected customers route
+- Logout
+
+### Dashboard
+
+- Today filter
+- This Week filter
+- This Month filter
+- Summary card updates
+- Loading state
+- Service request search
+- Service request status filter
+- Newest sorting
+- Oldest sorting
+- Empty/no-results state
+
+### Customers
+
+- Customer search
+- Customer status filtering
+- Add Customer modal
+- Required-field validation
+- Email validation
+- Duplicate email validation
+- Phone validation
+- Successful customer creation
+- Newly added customer search/filter
+- Customer details modal
+- Add modal cancellation
+- Delete confirmation
+- Cancel deletion
+- Successful deletion
+- Deleted customer search/filter update
+- Empty customer state
+
+### Responsive UI
+
+- Desktop layout
+- Tablet layout
+- Mobile layout
+- Sidebar adaptation
+- Responsive tables
+- Responsive forms
+- Responsive modals
+
+### Code Quality
+
+```bash
+npm run lint
+npm run build
+```
+
+Both commands were successfully verified during final development.
+
+---
+
+# Known Limitations
+
+Because this is a frontend-only assignment:
+
+- No backend server
+- No REST API
+- No database
+- Authentication is not real server-side authentication
+- Customer additions are not persistent
+- Customer deletions are not persistent
+- Refreshing the page resets mock customer data
+- Service requests use static mock data
+
+---
+
 # Future Improvements
 
 Possible future improvements include:
@@ -622,8 +785,8 @@ Possible future improvements include:
 - Real authentication
 - JWT-based authorization
 - Persistent customer data
-- Customer editing and deletion
-- Service request creation
+- Customer editing
+- Service request creation and management
 - Advanced dashboard analytics
 - Pagination
 - User roles and permissions
@@ -644,18 +807,29 @@ https://github.com/NGiri11
 
 # Project Status
 
-**Day 1:** Completed
+**Day 1:** Completed  
+**Day 2:** Completed  
+**Day 3:** Completed
 
-**Day 2:** Completed
-
-The current version is a functional frontend prototype with:
+The current version is a functional frontend customer service dashboard with:
 
 - Interactive dashboard
+- Dashboard period filtering
+- Service request search, filtering, and sorting
 - Customer management
-- Search and filtering
-- Service request sorting
-- Form validation
+- Customer search and filtering
+- Add customer functionality
+- Customer validation
+- Customer details
+- Delete customer functionality
+- Delete confirmation
 - Loading and empty states
+- Success feedback
 - Reusable React components
 - Mock data
+- Frontend-only authentication
 - Responsive design
+- ESLint validation
+- Production build support
+
+The project is ready for final frontend assignment review and demonstration.

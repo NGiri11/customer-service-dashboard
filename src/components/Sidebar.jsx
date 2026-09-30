@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, LogOut } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 function Sidebar() {
@@ -41,16 +41,11 @@ function Sidebar() {
           <Users size={19} />
           <span>Customers</span>
         </NavLink>
-        <p className="nav-title settings-title">SYSTEM</p>
-        <button className="nav-item sidebar-settings" type="button">
-          <Settings size={19} />
-          <span>Settings</span>
-        </button>
       </nav>
 
       {/* Logout */}
       <div className="sidebar-bottom">
-        <button className="logout-button" onClick={handleLogout}>
+        <button className="logout-button" type="button" onClick={handleLogout}>
           <LogOut size={19} />
           <span>Logout</span>
         </button>
